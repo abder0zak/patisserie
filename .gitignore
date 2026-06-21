@@ -81,3 +81,5 @@ output/
 
 # Legacy files
 pastryjs.json
+# Database
+pastries.db

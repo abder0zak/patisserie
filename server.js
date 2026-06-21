@@ -214,16 +214,21 @@ app.delete('/api/pastries/:id', authorizeAdmin, async (req, res) => {
 
         // Locate the item first
         let item;
+        let queryId;
         if (useMongoDB) {
-            let queryId;
             try {
                 queryId = new ObjectId(itemId);
             } catch (err) {
-                queryId = itemId;
+                return res.status(404).json({ error: "Item not found" });
             }
             item = await db.collection('pastries').findOne({ _id: queryId });
         } else {
-            item = await db.findOne({ _id: itemId });
+            queryId = itemId;
+            item = await db.findOne({ _id: queryId });
+        }
+
+        if (!item) {
+            return res.status(404).json({ error: "Item not found" });
         }
 
         // Delete image if needed
@@ -233,7 +238,7 @@ app.delete('/api/pastries/:id', authorizeAdmin, async (req, res) => {
             const urlParts = item.image.split('/');
             const publicIdWithExtension = urlParts.slice(-2).join('/');
             const publicId = publicIdWithExtension.split('.')[0];
-            await cloudinary.uploader.destroy(`pastries/${publicId}`);
+            await cloudinary.uploader.destroy(publicId);
           } else if (!useCloudinary && item.image.startsWith('/uploads/')) {
             // Delete local file
             const fullPath = path.join(__dirname, 'public', item.image);
@@ -244,15 +249,9 @@ app.delete('/api/pastries/:id', authorizeAdmin, async (req, res) => {
         // Delete from database
         let result;
         if (useMongoDB) {
-            let queryId;
-            try {
-                queryId = new ObjectId(itemId);
-            } catch (err) {
-                queryId = itemId;
-            }
             result = await db.collection('pastries').deleteOne({ _id: queryId });
         } else {
-            result = await db.remove({ _id: itemId }, {});
+            result = await db.remove({ _id: queryId }, {});
         }
 
         if (useMongoDB ? result.deletedCount === 0 : result === 0) {
