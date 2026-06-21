@@ -17,8 +17,8 @@
   "author": "Pastry Shop Developer",
   "license": "MIT",
   "dependencies": {
-    "cloudinary": "^1.41.0",
-    "express": "^4.18.2",
+    "cloudinary": "^2.10.0",
+    "express": "^4.22.2",
     "mongodb": "^6.21.0",
     "multer": "^1.4.5-lts.1",
     "nedb-promises": "^6.2.3",
