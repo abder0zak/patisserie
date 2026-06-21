@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maison du Sucre | HQ Admin Control Panel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-stone-100 text-stone-800 antialiased min-h-screen flex flex-col relative">
+
+    <div id="login-overlay" class="fixed inset-0 bg-stone-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white p-8 rounded-3xl max-w-sm w-full shadow-2xl border border-stone-200 text-center space-y-6">
+            <div class="space-y-2">
+                <h2 class="text-2xl font-bold text-stone-900" style="font-family: 'Playfair Display', serif;">Maison HQ</h2>
+                <p class="text-xs text-stone-500 uppercase tracking-widest">Restricted Access Portal</p>
+            </div>
+            <form id="login-form" class="space-y-4">
+                <input type="password" id="login-password" required placeholder="Enter Master Passcode" class="w-full px-4 py-3 rounded-xl border border-stone-200 focus:outline-stone-900 bg-stone-50 text-center text-sm tracking-widest">
+                <button type="submit" class="w-full bg-stone-900 hover:bg-stone-800 text-white text-xs font-bold tracking-widest uppercase py-3.5 rounded-xl transition shadow-md">
+                    Unlock Dashboard
+                </button>
+            </form>
+            <p id="login-error" class="text-xs text-red-600 font-medium hidden">Invalid passcode. Please try again.</p>
+        </div>
+    </div>
+
+    <header class="bg-stone-900 text-white shadow-xl px-8 h-20 flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+            <span class="text-xl tracking-wider font-bold text-amber-100" style="font-family: 'Playfair Display', serif;">Maison Control Tower</span>
+            <span class="text-[10px] bg-stone-700 uppercase px-2 py-0.5 rounded tracking-widest text-stone-300">Live DB Sync</span>
+        </div>
+        <div>
+            <button onclick="lockDashboard()" class="text-xs border border-stone-600 hover:border-red-400 hover:text-red-400 px-3 py-1.5 rounded transition">Lock Dashboard</button>
+        </div>
+    </header>
+
+    <main class="flex-grow max-w-7xl w-full mx-auto p-6 grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
+        <div class="bg-white rounded-2xl p-6 shadow-sm border border-stone-200 h-fit space-y-4">
+            <h2 class="text-lg font-bold text-stone-900 border-b border-stone-100 pb-2">Deploy New Menu Item</h2>
+            <form id="admin-add-form" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-stone-500 mb-1">Pastry Title</label>
+                    <input type="text" id="adm-name" required placeholder="e.g., Lemon Meringue Pie" class="w-full px-4 py-2.5 rounded-xl border border-stone-200 focus:outline-stone-900 bg-stone-50 text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-stone-500 mb-1">Set Price (DA)</label>
+                    <input type="number" step="0.01" id="adm-price" required placeholder="0.00" class="w-full px-4 py-2.5 rounded-xl border border-stone-200 focus:outline-stone-900 bg-stone-50 text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-stone-500 mb-1">Inventory Status Tag</label>
+                    <input type="text" id="adm-status" placeholder="Defaults to: Freshly Baked" class="w-full px-4 py-2.5 rounded-xl border border-stone-200 focus:outline-stone-900 bg-stone-50 text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-stone-500 mb-2">Upload Photo</label>
+                    <div class="flex items-center space-x-3">
+                        <input type="file" id="adm-image" accept="image/*" class="hidden" onchange="updatePhotoLabel()">
+                        <button type="button" onclick="document.getElementById('adm-image').click()" class="bg-stone-900 hover:bg-stone-800 text-white text-xs font-medium px-4 py-3 rounded-xl transition flex items-center space-x-2 shadow-sm">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 0 1 5.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 0 0-1.134-.175 2.31 2.31 0 0 1-1.64-1.055l-.822-1.316a2.192 2.192 0 0 0-1.736-1.039 48.774 48.774 0 0 0-5.232 0 2.192 2.192 0 0 0-1.736 1.039l-.821 1.316Z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 12.75a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0ZM18.75 10.5h.008v.008h-.008V10.5Z" />
+                            </svg>
+                            <span>Choose from Device</span>
+                        </button>
+                        <span id="photo-file-name" class="text-xs text-stone-400 italic truncate max-w-[150px]">No file chosen</span>
+                    </div>
+                </div>
+                <button type="submit" class="w-full bg-stone-900 hover:bg-stone-800 text-white text-xs font-bold tracking-widest uppercase py-4 rounded-xl transition shadow-md">
+                    Publish Live to Front Menu
+                </button>
+            </form>
+        </div>
+
+        <div class="lg:col-span-2 bg-white rounded-2xl p-6 shadow-sm border border-stone-200 space-y-4">
+            <h2 class="text-lg font-bold text-stone-900 border-b border-stone-100 pb-2">Active Catalog Listings</h2>
+            <div id="admin-table-container" class="space-y-3 max-h-[600px] overflow-y-auto pr-2">
+                </div>
+        </div>
+    </main>
+
+    <script>
+        function updatePhotoLabel() {
+            const input = document.getElementById('adm-image');
+            const label = document.getElementById('photo-file-name');
+            if (input.files && input.files[0]) {
+                label.innerText = input.files[0].name;
+                label.className = "text-xs text-stone-700 font-medium truncate max-w-[150px]";
+            } else {
+                resetPhotoLabel();
+            }
+        }
+
+        function resetPhotoLabel() {
+            const label = document.getElementById('photo-file-name');
+            label.innerText = "No file chosen";
+            label.className = "text-xs text-stone-400 italic truncate max-w-[150px]";
+        }
+
+        async function checkAuthentication() {
+            const secret = localStorage.getItem('admin_secret');
+            const overlay = document.getElementById('login-overlay');
+            
+            if (!secret) {
+                overlay.classList.remove('hidden');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/pastries');
+                if (response.ok) {
+                    overlay.classList.add('hidden'); 
+                    fetchManageableInventory(secret);
+                } else {
+                    lockDashboard(); 
+                }
+            } catch (err) {
+                console.error("Connection error:", err);
+            }
+        }
+
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const inputPassword = document.getElementById('login-password').value;
+            const errorMsg = document.getElementById('login-error');
+
+            const response = await fetch('/api/pastries/test_auth_id', {
+                method: 'DELETE',
+                headers: { 'x-admin-secret': inputPassword }
+            });
+
+            if (response.status === 401) {
+                errorMsg.classList.remove('hidden'); 
+            } else {
+                localStorage.setItem('admin_secret', inputPassword); 
+                document.getElementById('login-overlay').classList.add('hidden');
+                errorMsg.classList.add('hidden');
+                fetchManageableInventory(inputPassword);
+            }
+        });
+
+        function lockDashboard() {
+            localStorage.removeItem('admin_secret');
+            document.getElementById('login-password').value = '';
+            document.getElementById('login-overlay').classList.remove('hidden');
+        }
+
+        async function fetchManageableInventory(secret) {
+            try {
+                const response = await fetch('/api/pastries');
+                const items = await response.json();
+                const container = document.getElementById('admin-table-container');
+                container.innerHTML = '';
+
+                if (items.length === 0) {
+                    container.innerHTML = '<p class="text-stone-400 text-sm text-center py-8">Your digital bakery menu display database is empty.</p>';
+                    return;
+                }
+
+                items.forEach(item => {
+                    const row = document.createElement('div');
+                    row.className = "flex items-center justify-between p-3 border border-stone-100 rounded-xl bg-stone-50 hover:bg-stone-100/60 transition";
+                    row.innerHTML = `
+                        <div class="flex items-center space-x-4">
+                            <img src="${item.image}" class="w-12 h-12 object-cover rounded-lg border bg-white flex-shrink-0">
+                            <div>
+                                <h4 class="font-bold text-stone-900 text-sm">${item.name}</h4>
+                                <span class="text-xs text-stone-500">${parseFloat(item.price).toFixed(2)} DA &bull; </span>
+                                <span class="text-[11px] bg-stone-200 text-stone-700 px-1.5 py-0.2 rounded font-medium">${item.status}</span>
+                            </div>
+                        </div>
+                        <button onclick="terminateItem('${item._id}')" class="text-xs font-bold text-red-600 hover:bg-red-50 px-3 py-2 rounded-lg transition border border-transparent hover:border-red-200">
+                            Delete
+                        </button>
+                    `;
+                    container.appendChild(row);
+                });
+            } catch (err) {
+                console.error("Dashboard pull failure:", err);
+            }
+        }
+
+        async function terminateItem(id) {
+            const secret = localStorage.getItem('admin_secret');
+            if (!secret || !confirm("Permanently wipe this entry from servers?")) return;
+
+            const response = await fetch(`/api/pastries/${id}`, {
+                method: 'DELETE',
+                headers: { 'x-admin-secret': secret }
+            });
+
+            if (response.ok) {
+                fetchManageableInventory(secret);
+            } else if (response.status === 401) {
+                alert("Authorization token expired or invalid.");
+                lockDashboard();
+            }
+        }
+
+        document.getElementById('admin-add-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const secret = localStorage.getItem('admin_secret');
+            if (!secret) return;
+
+            const formData = new FormData();
+            formData.append('name', document.getElementById('adm-name').value);
+            formData.append('price', document.getElementById('adm-price').value);
+            formData.append('status', document.getElementById('adm-status').value);
+            
+            const fileInput = document.getElementById('adm-image');
+            if (fileInput.files[0]) {
+                formData.append('imageFile', fileInput.files[0]);
+            }
+
+            const response = await fetch('/api/pastries', {
+                method: 'POST',
+                headers: { 
+                    'x-admin-secret': secret
+                },
+                body: formData
+            });
+
+            if (response.ok) {
+                document.getElementById('admin-add-form').reset();
+                resetPhotoLabel();
+                fetchManageableInventory(secret);
+            } else if (response.status === 401) {
+                alert("Invalid Passcode.");
+                lockDashboard();
+            }
+        });
+
+        checkAuthentication();
+    </script>
+</body>
+</html>
