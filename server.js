@@ -26,12 +26,6 @@ const dbPath = isProduction
     ? '/opt/render/project/src/data/pastries.db' 
     : path.join(__dirname, 'pastries.db');
 
-const uploadDir = isProduction 
-    ? '/opt/render/project/src/data/uploads' 
-    : path.join(__dirname, 'public', 'uploads');
-
-// Initialize DB with the smart path
-const db = Datastore.create({ filename: dbPath, autoload: true });
 
 // Ensure upload directory exists
 if (!fs.existsSync(uploadDir)){
@@ -46,14 +40,7 @@ const storage = multer.diskStorage({
         cb(null, uniqueSuffix + path.extname(file.originalname));
     }
 });
-// Configure multer storage engine properties
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => cb(null, 'public/uploads/'),
-    filename: (req, file, cb) => {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        cb(null, uniqueSuffix + path.extname(file.originalname));
-    }
-});
+
 const upload = multer({ storage: storage });
 
 // Security gate check middleware
