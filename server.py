@@ -8,8 +8,13 @@ from fastapi.staticfiles import StaticFiles
 app = FastAPI()
 PORT = 3000
 ADMIN_SECRET = "Maison2026"
-DB_FILE = "pastries.db"
-
+# Use /tmp/ on Vercel so the database can initialize cleanly without permission crashes
+import sys
+if "vercel" in sys.modules or os.environ.get("VERCEL"):
+    DB_FILE = "/tmp/pastries.db"
+else:
+    DB_FILE = "pastries.db"
+    
 # Automatically construct the local directory for saved uploads if it doesn't exist
 UPLOAD_DIR = os.path.join("public", "uploads")
 if not os.path.exists(UPLOAD_DIR):
@@ -176,3 +181,4 @@ if os.path.exists("public"):
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run('server:app', host="0.0.0.0", port=PORT,reload=True)
+    app.mount("/", StaticFiles(directory="public", html=True), name="public")
