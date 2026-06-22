@@ -23,6 +23,8 @@ else:
 # Only try to create the directory locally, or use /tmp/ on Vercel
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
+app.mount("/uploads", StaticFiles(directory=UPLOAD_DIR), name="uploads")
+
 # Database Helper function to get a clean connection connection channel
 def get_db_connection():
     conn = sqlite3.connect(DB_FILE)
@@ -161,8 +163,9 @@ async def delete_pastry(item_id: str, _Secret: str = Depends(authorize_admin)):
 
         image_path = row["image"]
         if image_path and image_path.startswith("/uploads/"):
-            clean_image_path = image_path.lstrip("/") 
-            full_path = os.path.join("public", clean_image_path)
+            # Extract the part after "/uploads/"
+            relative_path = image_path[len("/uploads/"):]
+            full_path = os.path.join(UPLOAD_DIR, relative_path)
             if os.path.exists(full_path):
                 os.remove(full_path)
 
