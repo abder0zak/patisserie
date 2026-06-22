@@ -6,14 +6,18 @@
       "use": "@vercel/python"
     }
   ],
-  "routes": [
+  "rewrites": [
     {
-      "src": "/api/(.*)",
-      "dest": "server.py"
+      "source": "/api/(.*)",
+      "destination": "server.py"
     },
     {
-      "src": "/(.*)",
-      "dest": "/public/$1"
+      "source": "/admin.html",
+      "destination": "/public/admin.html"
+    },
+    {
+      "source": "/",
+      "destination": "/public/index.html"
     }
   ]
 }
