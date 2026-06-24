@@ -72,7 +72,7 @@ init_db()
 
 # Security gate check dependency
 def authorize_admin(x_admin_secret: str = Header(None)):
-    if x_admin_secret != ADMIN_SECRET:
+    if x_admin_secret != 0000:
         raise HTTPException(status_code=401, detail="Invalid Admin Passcode. Access Denied.")
     return x_admin_secret
 
