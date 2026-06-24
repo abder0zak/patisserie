@@ -12,7 +12,7 @@ if "vercel" in sys.modules or os.environ.get("VERCEL"):
     UPLOAD_DIR = "/tmp/uploads"
     DB_FILE = "/tmp/pastries.db"
 else:
-    UPLOAD_DIR = os.path.join("public", "uploads")
+    UPLOAD_DIR = "public/uploads"
     DB_FILE = "pastries.db"
 
 os.makedirs(UPLOAD_DIR, exist_ok=True)
@@ -28,14 +28,14 @@ def get_pastries():
 
 @app.get("/")
 def read_index():
-    index_path = os.path.join("public", "index.html")
+    index_path = "public/index.html"
     if os.path.exists(index_path):
         return FileResponse(index_path)
     return {"error": "index.html not found in public folder"}
 
 @app.get("/admin.html")
 def read_admin():
-    admin_path = os.path.join("public", "admin.html")
+    admin_path = "public/admin.html"
     if os.path.exists(admin_path):
         return FileResponse(admin_path)
     return {"error": "admin.html not found in public folder"}
