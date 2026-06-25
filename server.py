@@ -1,12 +1,13 @@
 import os
 import sys
-from fastapi import FastAPI
-from fastapi.responses import FileResponse HTML.Response
+from fastapi import FastAPI,Request
+from fastapi.responses import FileResponse ,HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+
 app = FastAPI()
 
-templates = Jinja2Templates(directory="public")
+template = Jinja2Templates(directory="templates")
 # 1. HANDLE DIRECTORIES SAFE FOR VERCEL
 # Vercel's runtime environment is read-only except for /tmp
 if "vercel" in sys.modules or os.environ.get("VERCEL"):
@@ -27,29 +28,24 @@ def get_pastries():
 # 3. EXPLICIT FRONTEND ROUTING (Fixes the 404 Error)
 # This forces the Python server to read your HTML pages directly from disk
 
-@app.get("/")
-def read_root(request: Request):
- 
-  return templates.TemplateResponse(name="index.html", context=context)
+@app.get("/", response_class=HTMLResponse)
+async def read_root(request: Request):
+    context = {"request": request}
+    return template.TemplateResponse(name="index.html", context=context)
     
     return {"error": "index.html not found in public folder"}
 
-@app.get("/admin.html")
-def read_admin():
-    admin_path = "/../public/admin.html"
-    if os.path.exists(admin_path):
-        return FileResponse(admin_path)
+@app.get("/admin.html", response_class=HTMLResponse)
+async def read_admin(request: Request):
+    context = {"request": request}
+    return template.TemplateResponse(name="admin.html", context=context)
+
     return {"error": "admin.html not found in public folder"}
-
-
-# 4. STATIC CSS/JS ASSETS
-# Mount the rest of the public folder so images/styles load properly
-if os.path.exists("public"):
- app.mount("/", StaticFiles(directory="public"), name="public")
-
 
 # 5. LOCAL RUNNER CONFIGURATION
 if __name__ == "__main__":
     import uvicorn
     # Hardcoded port example, change to your variable if needed
-    uvicorn.run("server:app", host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run("server:app", host="localhost", port=8000, reload=True)
+print(f"Server is running at http://localhost:8000")
+print(f"the curent working directory is {os.getcwd()}")
