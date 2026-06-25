@@ -106,43 +106,6 @@ async def read_admin(request: Request):
     return {"error": "admin.html not found in public folder"}
 
 
-@app.post("/api/pastries", status_code=201)
-async def add_pastry(
-    name: str = Form(...),
-    price: str = Form(...),
-    status: str = Form(None),
-    imageFile: UploadFile = File(None),
-    _Secret: str = Depends(authorize_admin)
-):        
-            with open(file_path, "wb") as buffer:
-                content = await imageFile.read()
-                buffer.write(content)
-                
-            image_location = f"/uploads/{filename}"
-
-        item_status = status if status else "Freshly Baked"
-
-        # SQL Insertion execution pipeline
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute(
-            'INSERT INTO pastries (name, price, status, image) VALUES (?, ?, ?, ?)',
-            (name, price, item_status, image_location)
-        )
-        conn.commit()
-        new_row_id = cursor.lastrowid
-        conn.close()
-
-        return {
-            "_id": str(new_row_id),
-            "name": name,
-            "price": price,
-            "status": item_status,
-            "image": image_location
-        }
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
 
 # 5. LOCAL RUNNER CONFIGURATION
 if __name__ == "__main__":
