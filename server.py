@@ -31,7 +31,7 @@ def get_pastries():
 @app.get("/", response_class=HTMLResponse)
 async def read_root(request: Request):
     context = {"request": request}
-    return template.TemplateResponse(name="index.html", context=context)
+    return template.TemplateResponse(request,name="index.html", context=context)
     
     return {"error": "index.html not found in public folder"}
 
