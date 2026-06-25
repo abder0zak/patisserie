@@ -1,11 +1,12 @@
 import os
 import sys
 from fastapi import FastAPI
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse HTML.Response
 from fastapi.staticfiles import StaticFiles
-
+from fastapi.templating import Jinja2Templates
 app = FastAPI()
 
+templates = Jinja2Templates(directory="public")
 # 1. HANDLE DIRECTORIES SAFE FOR VERCEL
 # Vercel's runtime environment is read-only except for /tmp
 if "vercel" in sys.modules or os.environ.get("VERCEL"):
@@ -27,10 +28,11 @@ def get_pastries():
 # This forces the Python server to read your HTML pages directly from disk
 
 @app.get("/")
-def read_index():
-    index_path = "/../public/index.html"
-    if os.path.exists(index_path):
-        return FileResponse(index_path)
+def read_index(req):
+async def read_root(request: Request):
+ 
+ templates.TemplateResponse(name="index.html", context=context)
+    
     return {"error": "index.html not found in public folder"}
 
 @app.get("/admin.html")
