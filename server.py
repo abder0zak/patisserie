@@ -64,11 +64,6 @@ def init_db():
 
 init_db()
 
-# Security gate check dependency
-def authorize_admin(x_admin_secret: str = Header(None)):
-    if x_admin_secret != "0000":
-        raise HTTPException(status_code=401, detail="Invalid Admin Passcode. Access Denied.")
-    return x_admin_secret
 
 
 # 2. YOUR API ENDPOINTS GO HERE (Example placeholder)
@@ -118,16 +113,7 @@ async def add_pastry(
     status: str = Form(None),
     imageFile: UploadFile = File(None),
     _Secret: str = Depends(authorize_admin)
-):
-    try:
-        image_location = "https://placehold.co/400x300/f5f5f4/a8a29e?text=No+Photo"
-        
-        if imageFile:
-            file_extension = os.path.splitext(imageFile.filename)[1]
-            unique_suffix = f"{int(time.time() * 1000)}-{random.randint(1, 1000000000)}"
-            filename = f"{unique_suffix}{file_extension}"
-            file_path = os.path.join(UPLOAD_DIR, filename)
-            
+):        
             with open(file_path, "wb") as buffer:
                 content = await imageFile.read()
                 buffer.write(content)
@@ -157,44 +143,7 @@ async def add_pastry(
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-# API: Delete a pastry item (Admin with Local Image cleanup)
-@app.delete("/api/pastries/{item_id}")
-async def delete_pastry(item_id: str, _Secret: str = Depends(authorize_admin)):
-    try:
-        if item_id == "test_auth_id":
-            return {"success": True, "message": "Authorization valid"}
 
-        if not item_id.isdigit():
-            raise HTTPException(status_code=400, detail="Invalid item ID format")
-
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        
-        # Grab image references to clean file structure locally
-        cursor.execute('SELECT image FROM pastries WHERE id = ?', (int(item_id),))
-        row = cursor.fetchone()
-        
-        if not row:
-            conn.close()
-            raise HTTPException(status_code=404, detail="Item not found")
-
-        image_path = row["image"]
-        if image_path and image_path.startswith("/uploads/"):
-            clean_image_path = image_path.lstrip("/") 
-            full_path = os.path.join("templates", clean_image_path)
-            if os.path.exists(full_path):
-                os.remove(full_path)
-
-        # Execute relational deletion command
-        cursor.execute('DELETE FROM pastries WHERE id = ?', (int(item_id),))
-        conn.commit()
-        conn.close()
-        
-        return {"success": True, "message": "Item removed"}
-    except HTTPException as he:
-        raise he
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
 # 5. LOCAL RUNNER CONFIGURATION
 if __name__ == "__main__":
     import uvicorn
