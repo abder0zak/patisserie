@@ -26,47 +26,6 @@ UPLOAD_DIR = os.path.join("templates", "uploads")
 if not os.path.exists(UPLOAD_DIR):
     os.makedirs(UPLOAD_DIR, exist_ok=True)
 
-# Database Helper function to get a clean connection connection channel
-def get_db_connection():
-    conn = sqlite3.connect(DB_FILE)
-    conn.row_factory = sqlite3.Row  # Enables fetching rows as dictionaries
-    return conn
-
-# Database Initialization: Create relational tables & apply seeds if empty
-def init_db():
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    
-    # Create the SQL table structure
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS pastries (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL,
-            price TEXT NOT NULL,
-            status TEXT NOT NULL,
-            image TEXT NOT NULL
-        )
-    ''')
-    conn.commit()
-
-    # Check if table is empty to apply seed entries
-    cursor.execute('SELECT COUNT(*) FROM pastries')
-    if cursor.fetchone()[0] == 0:
-        seed_data = [
-            ("Almond Croissant", "4.75", "Freshly Baked", "https://images.unsplash.com/photo-1555507036-ab1f4038808a?auto=format&fit=crop&w=400&q=80"),
-            ("Raspberry Tart", "6.20", "Only 3 Left!", "https://images.unsplash.com/photo-1587314168485-3236d6710814?auto=format&fit=crop&w=400&q=80")
-        ]
-        cursor.executemany('INSERT INTO pastries (name, price, status, image) VALUES (?, ?, ?, ?)', seed_data)
-        conn.commit()
-        print("Database initialized and seeded with baseline SQL rows!")
-        
-    conn.close()
-
-init_db()
-
-
-
-# 2. YOUR API ENDPOINTS GO HERE (Example placeholder)
 @app.get("/api/pastries")
 async def get_pastries():
     try:
