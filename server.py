@@ -26,28 +26,7 @@ UPLOAD_DIR = os.path.join("templates", "uploads")
 if not os.path.exists(UPLOAD_DIR):
     os.makedirs(UPLOAD_DIR, exist_ok=True)
 
-@app.get("/api/pastries")
-async def get_pastries():
-    try:
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute('SELECT * FROM pastries')
-        rows = cursor.fetchall()
-        conn.close()
-        
-        # Format the SQL results to match your JavaScript expected _id parameter smoothly
-        items = []
-        for row in rows:
-            items.append({
-                "_id": str(row["id"]),
-                "name": row["name"],
-                "price": row["price"],
-                "status": row["status"],
-                "image": row["image"]
-            })
-        return items
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+
 
 
 @app.get("/", response_class=HTMLResponse)
