@@ -38,7 +38,7 @@ async def read_root(request: Request):
 @app.get("/admin.html", response_class=HTMLResponse)
 async def read_admin(request: Request):
     context = {"request": request}
-    return template.TemplateResponse(name="admin.html", context=context)
+    return template.TemplateResponse(request,name="admin.html", context=context)
 
     return {"error": "admin.html not found in public folder"}
 
