@@ -28,10 +28,9 @@ def get_pastries():
 # This forces the Python server to read your HTML pages directly from disk
 
 @app.get("/")
-def read_index(req):
-async def read_root(request: Request):
+def read_root(request: Request):
  
- templates.TemplateResponse(name="index.html", context=context)
+  return templates.TemplateResponse(name="index.html", context=context)
     
     return {"error": "index.html not found in public folder"}
 
