@@ -56,6 +56,7 @@
         </section>
     </main>
 
+<<<<<<< HEAD
     <div id="popupOverlay" class="fixed inset-0 bg-stone-900/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4 transition-all duration-300">
         <div class="bg-white rounded-2xl w-full max-w-sm p-6 shadow-2xl border border-rose-100 relative transform scale-95 transition-all">
             <button id="closePopupBtn" class="absolute top-4 right-4 text-stone-400 hover:text-stone-900 text-xl font-bold">&times;</button>
@@ -102,6 +103,8 @@
         </div>
     </div>
 
+=======
+>>>>>>> 781be91884cbb0d5b32b78c002b8cae3286e1bac
     <footer class="bg-rose-950 text-rose-200/60 py-8 px-6 text-center text-sm border-t border-rose-900/40">
         <p class="font-serif-lux text-white mb-1 text-base">Maison du Sucre</p>
         <p class="text-[11px]">&copy; 2026 Boutique Catalog View.</p>
@@ -109,6 +112,7 @@
 
     <script>
         let cartCount = 0;
+<<<<<<< HEAD
         
         let activeItemPrice = 0;
         let activeItemMaxStock = 5; // Default safety cap if no stock field arrives from backend
@@ -198,6 +202,15 @@
         });
 
         // Fetching Pastries data payload
+=======
+
+        // Adds standard response click event to client window 
+        function addToBox() {
+            cartCount++;
+            document.getElementById('cart-count').innerText = cartCount;
+        }
+
+>>>>>>> 781be91884cbb0d5b32b78c002b8cae3286e1bac
         async function fetchPastries() {
             try {
                 const response = await fetch('/api/pastries');
@@ -211,10 +224,13 @@
                 }
 
                 pastries.forEach(item => {
+<<<<<<< HEAD
                     // Safe injection extraction fallback defaults if properties are missing
                     const currentStock = parseInt(item.stock) || 5;
                     const cleanPrice = parseFloat(item.price).toFixed(2);
 
+=======
+>>>>>>> 781be91884cbb0d5b32b78c002b8cae3286e1bac
                     const card = document.createElement('div');
                     card.className = "min-w-[280px] sm:min-w-[320px] bg-rose-50/20 rounded-2xl p-4 border border-rose-100/60 shadow-sm flex-shrink-0";
                     card.innerHTML = `
@@ -223,11 +239,19 @@
                         </div>
                         <div class="flex justify-between items-start mb-2">
                             <h3 class="font-bold text-stone-900">${item.name}</h3>
+<<<<<<< HEAD
                             <span class="text-sm font-medium text-rose-800">${cleanPrice}DA</span>
                         </div>
                         <div class="flex items-center justify-between mt-4">
                             <span class="text-xs bg-rose-100 text-rose-800 px-2 py-0.5 rounded-full font-medium">${currentStock} in stock</span>
                             <button onclick="openOrderModal('${item.name.replace(/'/g, "\\'")}', ${item.price}, ${currentStock})" class="text-xs border border-stone-300 bg-white hover:border-stone-900 px-4 py-2 transition rounded-lg font-medium">Add to Box</button>
+=======
+                            <span class="text-sm font-medium text-rose-800">${parseFloat(item.price).toFixed(2)}DA </span>
+                        </div>
+                        <div class="flex items-center justify-between mt-4">
+                            <span class="text-xs bg-rose-100 text-rose-800 px-2 py-0.5 rounded-full font-medium">${item.status}</span>
+                            <button onclick="addToBox()" class="text-xs border border-stone-300 bg-white hover:border-stone-900 px-4 py-2 transition rounded-lg">Add to Box</button>
+>>>>>>> 781be91884cbb0d5b32b78c002b8cae3286e1bac
                         </div>
                     `;
                     container.appendChild(card);
