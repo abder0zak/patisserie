@@ -110,6 +110,7 @@
     <script>
         let cartCount = 0;
         
+        // Active item tracking context
         let activeItemPrice = 0;
         let activeItemMaxStock = 5; // Default safety cap if no stock field arrives from backend
 
@@ -126,10 +127,10 @@
         const phoneInput = document.getElementById('phone');
 
         // Trigger Popup Modal and Pre-fill item contextual limits
-        function openOrderModal(name, price, stock) {
+        function openOrderModal(name, price, stockCount) {
             // Setup details based on clicked pastry item
             activeItemPrice = parseFloat(price);
-            activeItemMaxStock = parseInt(stock) || 5; // Fallback stock threshold
+            activeItemMaxStock = stockCount || 5; // Fallback stock threshold
 
             popupItemName.value = name;
             priceInput.value = activeItemPrice.toFixed(2);
@@ -161,6 +162,7 @@
             let value = parseInt(amountInput.value) || 0;
 
             if (value > activeItemMaxStock) {
+            
                 amountInput.value = activeItemMaxStock;
                 value = activeItemMaxStock;
             }
@@ -212,7 +214,7 @@
 
                 pastries.forEach(item => {
                     // Safe injection extraction fallback defaults if properties are missing
-                    const currentStock = parseInt(item.stock) || 5;
+                    const currentStock = item.stock !== undefined ? item.stock : 8; 
                     const cleanPrice = parseFloat(item.price).toFixed(2);
 
                     const card = document.createElement('div');
@@ -226,7 +228,7 @@
                             <span class="text-sm font-medium text-rose-800">${cleanPrice}DA</span>
                         </div>
                         <div class="flex items-center justify-between mt-4">
-                            <span class="text-xs bg-rose-100 text-rose-800 px-2 py-0.5 rounded-full font-medium">${currentStock} in stock</span>
+                            <span class="text-xs bg-rose-100 text-rose-800 px-2 py-0.5 rounded-full font-medium">${item.status}</span>
                             <button onclick="openOrderModal('${item.name.replace(/'/g, "\\'")}', ${item.price}, ${currentStock})" class="text-xs border border-stone-300 bg-white hover:border-stone-900 px-4 py-2 transition rounded-lg font-medium">Add to Box</button>
                         </div>
                     `;
